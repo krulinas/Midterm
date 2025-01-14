@@ -1,0 +1,188 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:projectmemberlink/myconfig.dart';
+import 'package:http/http.dart' as http;
+
+class SelectPayment extends StatefulWidget {
+  const SelectPayment({super.key});
+
+  @override
+  State<SelectPayment> createState() => _SelectPaymentState();
+}
+
+class _SelectPaymentState extends State<SelectPayment> {
+  // Map of payment methods and their corresponding web URLs
+  final paymentMethods = {
+    "Online Banking": null, // Special case for dropdown
+    "Credit / International Card": "https://example.com/credit-card",
+    "Debit Card / ATM": "https://example.com/debit-card",
+    "Touch 'n Go eWallet": "https://www.touchngo.com.my/ewallet/",
+    "Boost":
+        "${MyConfig.servername}/boost/choosepayment.php", // Dynamic Boost URL
+    "DuitNow QR": "https://example.com/duitnow-qr",
+  };
+
+  // List of banks for Online Banking
+  final banks = [
+    {"name": "Maybank2u", "url": "https://www.maybank2u.com.my"},
+    {"name": "CIMB Clicks", "url": "https://www.cimbclicks.com.my"},
+    {"name": "Public Bank", "url": "https://www.pbebank.com"},
+    {"name": "RHB Now", "url": "https://onlinebanking.rhbgroup.com/my/login"},
+    {"name": "Ambank", "url": "https://www.ambank.com.my"},
+    {"name": "MyBSN", "url": "https://www.mybsn.com.my"},
+    {"name": "Bank Rakyat", "url": "https://www.irakyat.com.my"},
+    {"name": "UOB", "url": "https://www.uob.com.my"},
+    {"name": "Affin Bank", "url": "https://www.affinonline.com"},
+    {"name": "Bank Islam", "url": "https://www.bankislam.biz"},
+    {"name": "HSBC Online", "url": "https://www.hsbc.com.my"},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Select Payment Method",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xFF0066B3), // Domino's Blue
+      ),
+      body: Container(
+        color: const Color(0xFFEC1C24), // Domino's Red
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            // Online Banking dropdown
+            Card(
+              color: Colors.white,
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ExpansionTile(
+                iconColor: const Color(0xFF0066B3), // Domino's Blue
+                textColor: const Color(0xFF0066B3),
+                title: const Text(
+                  "Online Banking",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                children: banks.map((bank) {
+                  return ListTile(
+                    title: Text(
+                      bank['name']!,
+                      style: const TextStyle(color: Colors.black87),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentWebView(
+                            title: bank['name']!,
+                            url: bank['url']!,
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            // Other payment methods
+            ...paymentMethods.entries.map((entry) {
+              if (entry.key == "Online Banking") {
+                return Container(); // Skip duplicate
+              }
+              return Card(
+                color: Colors.white,
+                margin: const EdgeInsets.symmetric(vertical: 8.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  title: Text(
+                    entry.key,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0066B3), // Domino's Blue
+                    ),
+                  ),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Color(0xFF0066B3), // Domino's Blue
+                  ),
+                  onTap: () {
+                    if (entry.value != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PaymentWebView(
+                            title: entry.key,
+                            url: entry.value!,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PaymentWebView extends StatefulWidget {
+  final String title;
+  final String url;
+
+  const PaymentWebView({
+    super.key,
+    required this.title,
+    required this.url,
+  });
+
+  @override
+  _PaymentWebViewState createState() => _PaymentWebViewState();
+}
+
+class _PaymentWebViewState extends State<PaymentWebView> {
+  @override
+  void initState() {
+    super.initState();
+    if (Platform.isAndroid) {
+      WebView.platform = AndroidWebView();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.title,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF0066B3), // AppBar color
+      ),
+      body: WebView(
+        initialUrl: widget.url,
+        javascriptMode: JavascriptMode.unrestricted,
+        allowsInlineMediaPlayback: true,
+        onWebResourceError: (error) {
+          print("WebView Error: ${error.description}");
+        },
+        navigationDelegate: (NavigationRequest request) {
+          print("Navigating to: ${request.url}");
+          return NavigationDecision.navigate;
+        },
+      ),
+    );
+  }
+}

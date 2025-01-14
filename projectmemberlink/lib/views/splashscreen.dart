@@ -25,7 +25,7 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Color(0xFF0066B3), // Domino's Blue
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -35,7 +35,7 @@ class SplashScreenState extends State<SplashScreen> {
               style: TextStyle(
                 fontSize: 40,
                 fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 0, 57, 104),
+                color: Colors.white, // White for contrast
                 letterSpacing: 2,
               ),
             ),
@@ -44,7 +44,8 @@ class SplashScreenState extends State<SplashScreen> {
               "A beginner-friendly application",
               style: TextStyle(
                 fontSize: 16,
-                color: Color.fromARGB(255, 141, 127, 0),
+                fontWeight: FontWeight.bold, // Correct way to bold the text
+                color: Color(0xFFEC1C24), // Domino's Red
                 fontFamily: 'Roboto',
               ),
             ),
@@ -54,7 +55,7 @@ class SplashScreenState extends State<SplashScreen> {
               width: 50,
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 1, 58, 105),
+                  Colors.white, // White spinner
                 ),
                 strokeWidth: 4,
               ),

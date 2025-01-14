@@ -11,8 +11,11 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class RegisterScreenState extends State<RegisterScreen> {
+  TextEditingController fullnamecontroller = TextEditingController();
+  TextEditingController usernamecontroller = TextEditingController();
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController passwordcontroller = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +51,26 @@ class RegisterScreenState extends State<RegisterScreen> {
               children: [
                 Image.asset('assets/images/login.png'),
                 TextField(
+                  controller: fullnamecontroller,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Full Name",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: usernamecontroller,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Username",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                TextField(
                   controller: emailcontroller,
                   keyboardType: TextInputType.emailAddress,
                   decoration: const InputDecoration(
@@ -68,6 +91,19 @@ class RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     hintText: "Your Password",
+                    hintStyle: TextStyle(color: Colors.grey),
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    hintText: "Phone Number",
                     hintStyle: TextStyle(color: Colors.grey),
                   ),
                   style: const TextStyle(color: Colors.white),
@@ -159,38 +195,42 @@ class RegisterScreenState extends State<RegisterScreen> {
   }
 
   void userRegistration() {
+    String fullName = fullnamecontroller.text;
+    String username = usernamecontroller.text;
     String email = emailcontroller.text;
     String pass = passwordcontroller.text;
+    String phoneNumber = phoneController.text;
+
     http.post(
       Uri.parse("${MyConfig.servername}/mymemberlink/api/registeruser.php"),
-      body: {"email": email, "password": pass},
+      body: {
+        "full_name": fullName,
+        "username": username,
+        "email": email,
+        "password": pass,
+        "phone_number": phoneNumber,
+      },
     ).then((response) {
       if (!mounted) return; // Ensure the widget is still active
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
         if (data['status'] == "success") {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Registration Success"),
-              backgroundColor: Colors.green,
-            ));
-          }
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Registration Success"),
+            backgroundColor: Colors.green,
+          ));
         } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Registration Failed"),
-              backgroundColor: Colors.red,
-            ));
-          }
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Registration Failed"),
+            backgroundColor: Colors.red,
+          ));
         }
       }
     }).catchError((error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("An error occurred: $error"),
-          backgroundColor: Colors.red,
-        ));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("An error occurred: $error"),
+        backgroundColor: Colors.red,
+      ));
     });
   }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:projectmemberlink/events/eventscreen.dart';
+import 'package:projectmemberlink/news/newsscreen.dart';
 import 'package:projectmemberlink/views/mainscreen.dart';
+import 'package:projectmemberlink/membership/memberscreen.dart';
 import 'package:projectmemberlink/products/productscreen.dart';
+import 'package:projectmemberlink/payments/paymentbills.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -9,18 +12,18 @@ class MyDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       child: Container(
-        color: Colors.yellow, // Set the background color to yellow
+        color: const Color(0xFF0066B3), // Domino's Blue for drawer background
         child: ListView(
           children: [
             const DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.black, // Black background for the header
+                color: Color(0xFFEC1C24), // Domino's Red for header background
               ),
               child: Text(
-                'Drawer Header',
+                'MyMemberLink',
                 style: TextStyle(
-                  color: Colors.yellow, // Yellow text for header
-                  fontSize: 20,
+                  color: Colors.white, // White text for header
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -33,6 +36,38 @@ class MyDrawer extends StatelessWidget {
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
                         const MainScreen(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0);
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
+              title: const Text(
+                "Home",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const NewsScreen(),
                     transitionsBuilder:
                         (context, animation, secondaryAnimation, child) {
                       const begin = Offset(1.0, 0.0); // Slide in from the right
@@ -52,7 +87,7 @@ class MyDrawer extends StatelessWidget {
               title: const Text(
                 "Newsletter",
                 style: TextStyle(
-                  color: Colors.black, // Black font for list items
+                  color: Colors.white, // White font for list items
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -84,7 +119,7 @@ class MyDrawer extends StatelessWidget {
               title: const Text(
                 "Events",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -116,25 +151,76 @@ class MyDrawer extends StatelessWidget {
               title: const Text(
                 "Products",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const ListTile(
-              title: Text(
-                "Members",
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const MemberScreen(),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0); // Slide in from the right
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
+              title: const Text(
+                "Memberships",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const ListTile(
-              title: Text(
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const PaymentBills(
+                      transactionId: "GPKtmb-KAFC250114SMYK",
+                      subscriptionDate: "2025-01-13",
+                      membershipPlan: "Platinum",
+                      totalAmount: 29.90,
+                    ),
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0); // Slide in from the right
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
+                  ),
+                );
+              },
+              title: const Text(
                 "Payments",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -143,7 +229,7 @@ class MyDrawer extends StatelessWidget {
               title: Text(
                 "Vetting",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -152,7 +238,7 @@ class MyDrawer extends StatelessWidget {
               title: Text(
                 "Settings",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -161,7 +247,7 @@ class MyDrawer extends StatelessWidget {
               title: Text(
                 "Logout",
                 style: TextStyle(
-                  color: Colors.black, // Black font
+                  color: Colors.white, // White font
                   fontWeight: FontWeight.bold,
                 ),
               ),

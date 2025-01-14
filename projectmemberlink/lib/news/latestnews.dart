@@ -7,10 +7,10 @@ class LatestNewsScreen extends StatefulWidget {
   const LatestNewsScreen({super.key});
 
   @override
-  State<LatestNewsScreen> createState() => _NewNewsScreenState();
+  State<LatestNewsScreen> createState() => LatestNewsScreenState();
 }
 
-class _NewNewsScreenState extends State<LatestNewsScreen> {
+class LatestNewsScreenState extends State<LatestNewsScreen> {
   TextEditingController titleController = TextEditingController();
   TextEditingController detailsController = TextEditingController();
 

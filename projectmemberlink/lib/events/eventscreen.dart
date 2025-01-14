@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'dart:developer';
 import 'package:intl/intl.dart';
 import 'package:projectmemberlink/myconfig.dart';
 import 'package:projectmemberlink/events/myevent.dart';
 import 'package:projectmemberlink/events/newevent.dart';
-import 'package:projectmemberlink/events/editevent.dart';
 import 'package:projectmemberlink/views/mydrawer.dart';
 import 'package:http/http.dart' as http;
 
@@ -20,9 +18,9 @@ class EventScreenState extends State<EventScreen> {
   late double screenWidth, screenHeight;
   final df = DateFormat('dd/MM/yyyy hh:mm a');
   String status = "Loading...";
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     loadEventsData();
   }
@@ -31,83 +29,138 @@ class EventScreenState extends State<EventScreen> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth <= 600) {}
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Events"),
+        title: const Text(
+          "Events",
+          style: TextStyle(
+            color: Colors.white, // White text
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: const Color(0xFF0066B3), // Domino's Blue
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.refresh))
+          IconButton(
+            onPressed: loadEventsData,
+            icon: const Icon(Icons.refresh, color: Colors.white),
+          ),
         ],
       ),
-      body: eventsList.isEmpty
-          ? Center(
-              child: Text(
-                status,
-                style: const TextStyle(
-                    color: Colors.red,
+      body: Container(
+        color: const Color(0xFFEC1C24), // Domino's Red for background
+        child: eventsList.isEmpty
+            ? Center(
+                child: Text(
+                  status,
+                  style: const TextStyle(
+                    color: Colors.white, // White text
                     fontSize: 20,
-                    fontWeight: FontWeight.bold),
-              ),
-            )
-          : GridView.count(
-              childAspectRatio: 0.75,
-              crossAxisCount: 2,
-              children: List.generate(eventsList.length, (index) {
-                return Card(
-                  child: InkWell(
-                    splashColor: Colors.red,
-                    onLongPress: () {
-                      deleteDialog(index);
-                    },
-                    onTap: () {
-                      showEventDetailsDialog(index);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(4, 8, 4, 4),
-                      child: Column(children: [
-                        Text(
-                          eventsList[index].eventTitle.toString(),
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                        SizedBox(
-                          child: Image.network(
-                              errorBuilder: (context, error, stackTrace) =>
-                                  Image.asset(
-                                    "assets/images/na.png",
-                                  ),
-                              width: screenWidth / 2,
-                              height: screenHeight / 6,
-                              fit: BoxFit.cover,
-                              scale: 4,
-                              "${MyConfig.servername}/memberlink/assets/events/${eventsList[index].eventFilename}"),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-                          child: Text(
-                            eventsList[index].eventType.toString(),
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Text(df.format(DateTime.parse(
-                            eventsList[index].eventDate.toString()))),
-                        Text(truncateString(
-                            eventsList[index].eventDescription.toString(), 45)),
-                      ]),
-                    ),
+                    fontWeight: FontWeight.bold,
                   ),
-                );
-              })),
+                ),
+              )
+            : GridView.builder(
+                padding: const EdgeInsets.all(8),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.75,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                ),
+                itemCount: eventsList.length,
+                itemBuilder: (context, index) {
+                  return buildEventCard(index);
+                },
+              ),
+      ),
       drawer: const MyDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (content) => const NewEventScreen()));
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (content) => const NewEventScreen()),
+          );
         },
+        backgroundColor: const Color(0xFF0066B3), // Domino's Blue
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget buildEventCard(int index) {
+    final event = eventsList[index];
+    return Card(
+      color: Colors.white, // White card background
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        splashColor: const Color(0xFFEC1C24), // Domino's Red
+        onTap: () {
+          showEventDetailsDialog(index);
+        },
+        onLongPress: () {
+          deleteDialog(index);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                event.eventTitle ?? "No Title",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0066B3), // Domino's Blue
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  "${MyConfig.servername}/memberlink/assets/events/${event.eventFilename}",
+                  width: double.infinity,
+                  height: screenHeight / 6,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => const Icon(
+                    Icons.broken_image,
+                    size: 50,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                event.eventType ?? "No Type",
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                df.format(DateTime.parse(event.eventDate.toString())),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                truncateString(event.eventDescription ?? "No Description", 45),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -125,129 +178,138 @@ class EventScreenState extends State<EventScreen> {
     http
         .get(Uri.parse("${MyConfig.servername}/mymemberlink/api/loadevent.php"))
         .then((response) {
-      log(response.body.toString());
       if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
+        final data = jsonDecode(response.body);
         if (data['status'] == "success") {
-          var result = data['data']['events'];
-          eventsList.clear();
-          for (var item in result) {
-            MyEvent myevent = MyEvent.fromJson(item);
-            eventsList.add(myevent);
-          }
-          setState(() {});
+          final List<dynamic> result = data['data']['events'];
+          setState(() {
+            eventsList = result
+                .map((item) => MyEvent.fromJson(item))
+                .toList()
+                .cast<MyEvent>();
+            status = "Loaded";
+          });
         } else {
-          status = "No Data";
+          setState(() {
+            status = "No events available";
+          });
         }
       } else {
-        status = "Error loading data";
-        print("Error");
-        setState(() {});
+        setState(() {
+          status = "Error loading data";
+        });
       }
+    }).catchError((error) {
+      setState(() {
+        status = "Error: $error";
+      });
     });
   }
 
   void showEventDetailsDialog(int index) {
+    final event = eventsList[index];
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(eventsList[index].eventTitle.toString()),
-            content: SingleChildScrollView(
-              child: Column(children: [
-                Image.network(
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                          "assets/images/na.png",
-                        ),
-                    width: screenWidth,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E1E1E),
+          title: Text(
+            event.eventTitle ?? "No Title",
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    "${MyConfig.servername}/memberlink/assets/events/${event.eventFilename}",
+                    width: double.infinity,
                     height: screenHeight / 4,
                     fit: BoxFit.cover,
-                    scale: 4,
-                    "${MyConfig.servername}/memberlink/assets/events/${eventsList[index].eventFilename}"),
-                Text(eventsList[index].eventType.toString()),
-                Text(df.format(
-                    DateTime.parse(eventsList[index].eventDate.toString()))),
-                Text(eventsList[index].eventLocation.toString()),
-                const SizedBox(height: 10),
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.broken_image,
+                      size: 50,
+                      color: Colors.red,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  eventsList[index].eventDescription.toString(),
+                  event.eventType ?? "No Type",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  df.format(DateTime.parse(event.eventDate.toString())),
+                  style: const TextStyle(color: Colors.white70),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  event.eventDescription ?? "No Description",
                   textAlign: TextAlign.justify,
-                )
-              ]),
+                  style: const TextStyle(color: Colors.white70),
+                ),
+              ],
             ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  Navigator.pop(context);
-                  MyEvent myevent = eventsList[index];
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (content) => EditEventScreen(
-                                myevent: myevent,
-                              )));
-                  loadEventsData();
-                },
-                child: const Text("Edit Event"),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Close"),
-              )
-            ],
-          );
-        });
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Close", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void deleteDialog(int index) {
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              title: Text(
-                "Delete \"${truncateString(eventsList[index].eventTitle.toString(), 20)}\"",
-                style: const TextStyle(fontSize: 18),
-              ),
-              content:
-                  const Text("Are you sure you want to delete this event?"),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("No"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    deleteNews(index);
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Yes"),
-                )
-              ]);
-        });
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1E1E1E),
+          title:
+              const Text("Delete Event", style: TextStyle(color: Colors.white)),
+          content: const Text(
+            "Are you sure you want to delete this event?",
+            style: TextStyle(color: Colors.white70),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("No", style: TextStyle(color: Colors.white)),
+            ),
+            TextButton(
+              onPressed: () {
+                deleteEvent(index);
+                Navigator.pop(context);
+              },
+              child: const Text("Yes", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  void deleteNews(int index) {
+  void deleteEvent(int index) {
+    final event = eventsList[index];
     http.post(
-        Uri.parse("${MyConfig.servername}/mymemberlink/api/deleteevent.php"),
-        body: {
-          "eventid": eventsList[index].eventId.toString()
-        }).then((response) {
+      Uri.parse("${MyConfig.servername}/mymemberlink/api/deleteevent.php"),
+      body: {"eventid": event.eventId.toString()},
+    ).then((response) {
       if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-        log(data.toString());
+        final data = jsonDecode(response.body);
         if (data['status'] == "success") {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Success"),
+            content: Text("Event deleted successfully"),
             backgroundColor: Colors.green,
           ));
           loadEventsData();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text("Failed"),
+            content: Text("Failed to delete event"),
             backgroundColor: Colors.red,
           ));
         }

@@ -93,7 +93,7 @@ class ProductScreenState extends State<ProductScreen> {
                   child: Text(
                     "Page: $curPage/$numOfPages",
                     style: const TextStyle(
-                      color: Colors.yellow,
+                      color: Color.fromARGB(255, 0, 0, 0),
                       fontSize: 16,
                     ),
                   ),

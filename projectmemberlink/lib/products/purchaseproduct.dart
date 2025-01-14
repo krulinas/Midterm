@@ -105,7 +105,7 @@ class _PurchaseProductState extends State<PurchaseProduct> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            "Price: \RM${productList[index].productPrice?.toStringAsFixed(2) ?? '0.00'}",
+                            "Price: RM${productList[index].productPrice?.toStringAsFixed(2) ?? '0.00'}",
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.white70,
@@ -147,7 +147,7 @@ class _PurchaseProductState extends State<PurchaseProduct> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Price: \RM${productList[index].productPrice?.toStringAsFixed(2) ?? '0.00'}",
+                "Price: RM${productList[index].productPrice?.toStringAsFixed(2) ?? '0.00'}",
                 style: const TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 8),
@@ -164,13 +164,13 @@ class _PurchaseProductState extends State<PurchaseProduct> {
               TextField(
                 controller: quantityController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Enter quantity",
-                  labelStyle: const TextStyle(color: Colors.yellow),
-                  enabledBorder: const OutlineInputBorder(
+                  labelStyle: TextStyle(color: Colors.yellow),
+                  enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.yellow),
                   ),
-                  focusedBorder: const OutlineInputBorder(
+                  focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.yellow, width: 2.0),
                   ),
                 ),
@@ -194,8 +194,8 @@ class _PurchaseProductState extends State<PurchaseProduct> {
                   Navigator.pop(context);
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text("Invalid quantity entered."),
+                    const SnackBar(
+                      content: Text("Invalid quantity entered."),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -250,13 +250,13 @@ class _PurchaseProductState extends State<PurchaseProduct> {
                       style: const TextStyle(color: Colors.white),
                     ),
                     subtitle: Text(
-                      "Quantity: ${entry.value}, Total: \RM${(entry.key.productPrice ?? 0) * entry.value}",
+                      "Quantity: ${entry.value}, Total: RM${(entry.key.productPrice ?? 0) * entry.value}",
                       style: const TextStyle(color: Colors.white70),
                     ),
                   )),
               const SizedBox(height: 10),
               Text(
-                "Total Price: \RM${total.toStringAsFixed(2)}",
+                "Total Price: RM${total.toStringAsFixed(2)}",
                 style: const TextStyle(color: Colors.white, fontSize: 16),
               ),
             ],
